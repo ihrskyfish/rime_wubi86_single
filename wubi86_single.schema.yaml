@@ -1,0 +1,121 @@
+# Rime schema settings
+# encoding: utf-8
+
+schema:
+  schema_id: wubi86_single
+  name: "五笔86_single"
+  version: "0.21"
+  author:
+    - 發明人 王永民先生
+  description: |
+    五筆字型86版
+    碼表源自 ibus-table
+    敲 z 鍵進入拼音反查
+  dependencies:
+    - pinyin_simp
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [ 中文, 西文 ]
+  - name: full_shape
+    states: [ 半角, 全角 ]
+  - name: extended_charset
+    states: [ 常用, 增廣 ]
+  - name: ascii_punct
+    states: [ 。，, ．， ]
+
+engine:
+  processors:
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - chord_composer
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - reverse_lookup_translator
+    - table_translator
+
+speller:
+  delimiter: " ;'"
+  #max_code_length: 4
+
+translator:
+  dictionary: wubi86_single
+  enable_charset_filter: true
+  enable_sentence: true
+  enable_encoder: true
+  encode_commit_history: true
+  max_phrase_length: 4
+  disable_user_dict_for_patterns:
+    - "^z.*$"
+
+reverse_lookup:
+  dictionary: pinyin_simp
+  prefix: "z"
+  suffix: "'"
+  tips: 〔拼音〕
+  preedit_format:
+    - xform/([nl])v/$1ü/
+    - xform/([nl])ue/$1üe/
+    - xform/([jqxy])v/$1u/
+
+punctuator:
+  import_preset: symbols
+
+key_binder:
+  import_preset: default
+
+recognizer:
+  import_preset: default
+  patterns:
+    punct: '^/([0-9]0?|[A-Za-z]+)$'
+    reverse_lookup: "^z[a-z]*'?$"
+
+chord_composer:
+  alphabet: "abcdefghijklmnopqrstuvwxyz"
+  algebra:
+    # ===== 左手并击 → 右手区字母（你给出的映射） =====
+    - xform/^ef$/y/
+    - xform/^er$/u/
+    - xform/^ew$/i/      # we 排序后为 ew
+    - xform/^rw$/o/      # wr 排序后为 rw
+    - xform/^qr$/p/
+    - xform/^fw$/h/      # wf 排序后为 fw
+    - xform/^df$/j/
+    - xform/^ds$/k/      # sd 排序后为 ds
+    - xform/^fs$/l/      # sf 排序后为 fs
+    - xform/^af$/;/
+    - xform/^cs$/n/      # sc 排序后为 cs
+    - xform/^cv$/m/
+    - xform/^cx$/,/      # xc 排序后为 cx
+    - xform/^vx$/./      # xv 排序后为 vx
+    - xform/^vz$///      # zv 排序后为 vz
+
+    # ===== 右手并击 → 左手区字母（镜像推导） =====
+    # - xform/^op$/q/
+    # - xform/^io$/w/
+    # - xform/^iu$/e/
+    # - xform/^uy$/r/
+    # - xform/^kl$/t/
+    # - xform/^;l$/a/
+    # - xform/^jl$/s/
+    # - xform/^jk$/d/
+    # - xform/^hk$/f/
+    # - xform/^hj$/g/
+    # - xform/^.$/z/       # ./ 排序后为 ./
+    # - xform/^.m$/x/
+    # - xform/^,m$/c/
+    # - xform/^,j$/v/      # j, 排序后为 ,j
+    # - xform/^,.$/b/      # ,. 排序后为 ,.
